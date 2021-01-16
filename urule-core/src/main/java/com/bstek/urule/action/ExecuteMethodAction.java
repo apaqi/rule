@@ -26,10 +26,12 @@ import java.util.Set;
 import com.bstek.urule.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MsgType;
+import com.bstek.urule.model.GeneralEntity;
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rule.Parameter;
 import com.bstek.urule.runtime.rete.Context;
 import com.bstek.urule.runtime.rete.ValueCompute;
+import org.apache.commons.beanutils.BeanUtils;
 
 /**
  * @author Jacky.gao
@@ -83,7 +85,20 @@ public class ExecuteMethodAction extends AbstractAction {
 				if(actionId!=null){
 					valueKey=actionId.value();
 				}
-				Object value=method.invoke(obj, wrap.getValues());
+				Object[] values = wrap.getValues();
+				Object[] convertedValues = new Object[values.length];
+				for (int i=0,len=values.length;i<len;i++) {
+					Object o = values[i];
+					if(o instanceof GeneralEntity) {
+						GeneralEntity generalEntity = (GeneralEntity)o;
+						String targetClass = generalEntity.getTargetClass();
+						Class newClass = Class.forName(targetClass);
+						Object targetObj = newClass.newInstance();
+						BeanUtils.populate(targetObj, generalEntity);
+						convertedValues[i] = targetObj;
+					}
+				}
+				Object value=method.invoke(obj, convertedValues);
 				if(debug && Utils.isDebug()){
 					String msg=info+"("+wrap.valuesToString()+")";
 					context.debugMsg(msg, MsgType.ExecuteBeanMethod, debug);

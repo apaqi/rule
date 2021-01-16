@@ -88,6 +88,7 @@ public class Criteria extends BaseCriterion implements BaseCriteria{
 					scriptMethodAction.setParameters(methodPart.getParameters());
 					scriptMethodAction.setScriptType(methodPart.getScriptType());
 					scriptMethodAction.setExpression(methodPart.getExpression());
+					scriptMethodAction.setScriptMethodName(methodPart.getScriptMethodName());
 					ActionValue actionValue = scriptMethodAction.execute(context, obj, allMatchedObjects,null);
 					if(actionValue==null){
 						leftValue=null;

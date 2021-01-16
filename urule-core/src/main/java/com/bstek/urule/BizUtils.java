@@ -157,8 +157,9 @@ public class BizUtils {
         parameter.setType(type);
         VariableValue variableValue = new VariableValue();
         variableValue.setVariableName(varName);
+        variableValue.setVariableLabel(varName);
         variableValue.setDatatype(type);
-        variableValue.setVariableCategory("参数");
+       // variableValue.setVariableCategory(varName);
         parameter.setValue(variableValue);
         return parameter;
     }
@@ -215,5 +216,23 @@ public class BizUtils {
         methodAction.setMethodName(methodName);
         methodAction.setParameters(paramList);
         return methodAction;
+    }
+
+
+
+    /**
+     * 构建变量参数
+     *
+     * @param parName parName
+     * @param type    type
+     * @param variableCategoryValue variableCategoryValue
+     * @return Parameter Parameter
+     */
+    public static Parameter buildVariableCategoryValueParameter(String parName, Datatype type, VariableCategoryValue variableCategoryValue) {
+        Parameter parameter = new Parameter();
+        parameter.setName(parName);
+        parameter.setType(type);
+        parameter.setValue(variableCategoryValue);
+        return parameter;
     }
 }

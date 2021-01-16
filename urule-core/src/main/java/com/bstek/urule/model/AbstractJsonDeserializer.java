@@ -220,6 +220,7 @@ public abstract class AbstractJsonDeserializer<T> extends JsonDeserializer<T> {
 				scriptMethod.setParameters(JsonUtils.parseParameters(jsonNode));
 				scriptMethod.setScriptType(ScriptType.getByName(JsonUtils.getJsonValue(jsonNode, "scriptType")));
 				scriptMethod.setExpression(JsonUtils.getJsonValue(jsonNode, "expression"));
+				scriptMethod.setScriptMethodName(JsonUtils.getJsonValue(jsonNode, "scriptMethodName"));
 				actions.add(scriptMethod);
 				break;
 			case VariableAssign:

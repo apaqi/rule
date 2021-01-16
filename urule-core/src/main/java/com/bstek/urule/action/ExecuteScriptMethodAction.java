@@ -5,13 +5,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.bstek.urule.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MsgType;
+import com.bstek.urule.model.GeneralEntity;
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rule.Parameter;
 import com.bstek.urule.runtime.rete.Context;
 import com.bstek.urule.runtime.rete.ValueCompute;
 import com.bstek.urule.script.AviatorAction;
+import com.bstek.urule.script.GroovyAction;
 import com.bstek.urule.script.JsonPathAction;
 import com.bstek.urule.script.ScriptType;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Method;
@@ -35,6 +38,10 @@ public class ExecuteScriptMethodAction extends AbstractAction {
      * 脚本表达式
      */
     private String expression;
+    /**
+     * 脚本表达式
+     */
+    private String scriptMethodName;
 
     @Override
     public ActionValue execute(Context context, Object matchedObject, List<Object> allMatchedObjects, Map<String, Object> variableMap) {
@@ -78,7 +85,20 @@ public class ExecuteScriptMethodAction extends AbstractAction {
                 if (actionId != null) {
                     valueKey = actionId.value();
                 }
-                Object value = method.invoke(obj, wrap.getValues());
+                Object[] values = wrap.getValues();
+                Object[] convertedValues = new Object[values.length];
+                for (int i=0,len=values.length;i<len;i++) {
+                    Object o = values[i];
+                    if(o instanceof GeneralEntity) {
+                        GeneralEntity generalEntity = (GeneralEntity)o;
+                        String targetClass = generalEntity.getTargetClass();
+                        Class newClass = Class.forName(targetClass);
+                        Object targetObj = newClass.newInstance();
+                        BeanUtils.populate(targetObj, generalEntity);
+                        convertedValues[i] = targetObj;
+                    }
+                }
+                Object value = method.invoke(obj, convertedValues);
                 if (debug && Utils.isDebug()) {
                     String msg = info + "(" + wrap.valuesToString() + ")";
                     context.debugMsg(msg, MsgType.ExecuteBeanMethod, debug);
@@ -301,6 +321,12 @@ public class ExecuteScriptMethodAction extends AbstractAction {
                     aviatorAction.setExpression(expression);
                     //value是map结构
                     return aviatorAction.actionInvoker().invoke(value);
+                case GROOVY:
+                    GroovyAction groovyAction = new GroovyAction();
+                    groovyAction.setExpression(expression);
+                    groovyAction.setScriptMethodName(scriptMethodName);
+                    //value是map结构
+                    return groovyAction.actionInvoker().invoke(value);
                 default:
                     return value;
             }
@@ -324,6 +350,14 @@ public class ExecuteScriptMethodAction extends AbstractAction {
 
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    public String getScriptMethodName() {
+        return scriptMethodName;
+    }
+
+    public void setScriptMethodName(String scriptMethodName) {
+        this.scriptMethodName = scriptMethodName;
     }
 }
 

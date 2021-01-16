@@ -11,10 +11,7 @@ import com.bstek.urule.model.library.constant.ConstantCategory;
 import com.bstek.urule.model.library.variable.Variable;
 import com.bstek.urule.model.library.variable.VariableCategory;
 import com.bstek.urule.model.library.variable.VariableLibrary;
-import com.bstek.urule.model.rule.Other;
-import com.bstek.urule.model.rule.Rhs;
-import com.bstek.urule.model.rule.Rule;
-import com.bstek.urule.model.rule.RuleSet;
+import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.Lhs;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.KnowledgeSession;
@@ -75,11 +72,12 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @since  2020/12/29 14:09
      */
     public ExecutionResponse execute(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
-        KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, variableCategoryLibs);
+        KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, null);
         KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
         //构造树
         KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
-        Map<VariableCategory, Object> facts = buildFacts(knowledgeBase);
+        //Map<VariableCategory, Object> facts = buildFacts(knowledgeBase);
+        Map<VariableCategory, Object> facts = buildFacts(variableCategoryLibs);
         Map<String, Object> parameters = null;
         for (Object obj : facts.values()) {
             if (!(obj instanceof GeneralEntity) && (obj instanceof HashMap)) {
@@ -101,12 +99,12 @@ public class KnowledgeHelper implements ApplicationContextAware {
     /**
      * 构造参数
      *
-     * @param knowledgeBase knowledgeBase
+     * @param variableCategoryLibs variableCategoryLibs
      * @return Map Map
      */
-    private Map<VariableCategory, Object> buildFacts(KnowledgeBase knowledgeBase) {
+    private Map<VariableCategory, Object> buildFacts(List<VariableLibrary> variableCategoryLibs) {
         Map<VariableCategory, Object> facts = new HashMap<VariableCategory, Object>();
-        List<VariableCategory> variableCategories = knowledgeBase.getResourceLibrary().getVariableCategories();
+        List<VariableCategory> variableCategories = variableCategoryLibs.get(0).getVariableCategories();//knowledgeBase.getResourceLibrary().getVariableCategories();
         for (VariableCategory vc : variableCategories) {
             String clazz = vc.getClazz();
             Object entity = null;
@@ -134,16 +132,34 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @return com.bstek.urule.builder.KnowledgeBase KnowledgeBase
      * @author wpx
      * @since  2020/12/29 13:44
+     *
+     *  DP_MT_100@3333-001_V1.0.0
+     *
+     * <parameter-library>
+     *     <parameter name="pin" type="String" act="InOut"/>
+     *     <parameter name="testFlag" type="String" act="InOut"/>
+     *     <parameter name="batchNo" type="String" act="InOut"/>
+     *     <parameter name="routeId" type="String" act="InOut"/>
+     *     <parameter name="busVersion" type="String" act="InOut"/>
+     *     <parameter name="busId" type="String" act="InOut"/>
+     *     <parameter name="crowdId" type="String" act="InOut"/>
+     * </parameter-library>
      */
     private KnowledgeBase buildKnowledgeBaseByRuleSet(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
-        //KnowledgeBase knowledgeBase = KNOWLEDGE_CACHE.getIfPresent(ruleId);
-       // if (null == knowledgeBase) {
+        KnowledgeBase knowledgeBase = KNOWLEDGE_CACHE.getIfPresent(ruleId);
+        if (null == knowledgeBase) {
             RuleSet ruleSet = new RuleSet();
             ruleSet.setRemark("RuleRegister");
             ruleSet.setRules(Arrays.asList(this.buildRule(lhs, other, rhs)));
-            KnowledgeBase knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variableCategoryLibs);
-           // KNOWLEDGE_CACHE.put(ruleId, knowledgeBase);
-       // }
+            List<Library> libraries = new ArrayList<>();
+
+            Library library = new Library();
+            library.setPath("file://githubcode/rule/urule-core/src/main/resourceslibtest" );
+            libraries.add(library);
+            ruleSet.setLibraries(libraries);
+            knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variableCategoryLibs);
+            KNOWLEDGE_CACHE.put(ruleId, knowledgeBase);
+        }
         return knowledgeBase;
     }
 

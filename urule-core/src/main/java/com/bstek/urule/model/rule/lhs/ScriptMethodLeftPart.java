@@ -30,6 +30,12 @@ public class ScriptMethodLeftPart implements LeftPart {
      * 脚本表达式
      */
     private String expression;
+
+    /**
+     * 脚本表达式方法名称
+     */
+    private String scriptMethodName;
+
     public String getBeanId() {
         return beanId;
     }
@@ -75,6 +81,14 @@ public class ScriptMethodLeftPart implements LeftPart {
 
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    public String getScriptMethodName() {
+        return scriptMethodName;
+    }
+
+    public void setScriptMethodName(String scriptMethodName) {
+        this.scriptMethodName = scriptMethodName;
     }
 
     @Override

@@ -5,8 +5,8 @@ import java.util.Map;
 
 public enum ScriptType {
     JSONPATH,
-    AVIATOR
-    //,GROOVY
+    AVIATOR,
+    GROOVY
     ;
 
     private final static Map<String, ScriptType> TYPE = new HashMap<>(2);

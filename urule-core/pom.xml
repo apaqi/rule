@@ -5,6 +5,8 @@
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	  <json-path.version>2.4.0</json-path.version>
+	  <groovy-sandbox.version>1.19</groovy-sandbox.version>
+	  <groovy-all.version>2.4.18</groovy-all.version>
   </properties>  
   <dependencies>
 	<dependency>
@@ -109,6 +111,28 @@
 		  <version>${json-path.version}</version>
 	  </dependency>
 
+	  <dependency>
+		  <groupId>org.kohsuke</groupId>
+		  <artifactId>groovy-sandbox</artifactId>
+		  <version>${groovy-sandbox.version}</version>
+		  <exclusions>
+			  <exclusion>
+				  <groupId>org.codehaus.groovy</groupId>
+				  <artifactId>groovy</artifactId>
+			  </exclusion>
+		  </exclusions>
+	  </dependency>
+	  <dependency>
+		  <groupId>org.codehaus.groovy</groupId>
+		  <artifactId>groovy-all</artifactId>
+		  <version>${groovy-all.version}</version>
+		  <exclusions>
+			  <exclusion>
+				  <groupId>org.slf4j</groupId>
+				  <artifactId>slf4j-api</artifactId>
+			  </exclusion>
+		  </exclusions>
+	  </dependency>
   </dependencies>
   <parent>
   	<groupId>com.bstek.urule</groupId>

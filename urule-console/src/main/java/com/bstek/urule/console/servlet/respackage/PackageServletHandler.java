@@ -40,7 +40,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.commons.json.JsonUtil;
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
@@ -612,8 +612,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	@SuppressWarnings({ "unchecked"})
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		//testRuleGroup(req, resp);
-		testScriptMethodRule(req,  resp);
-		//doTest_back(req,  resp);
+		//testScriptMethodRule(req,  resp);
+		doTest_back(req,  resp);
+		//testMethodRule(req, resp);
  		System.out.println();
 	}
 
@@ -1020,6 +1021,73 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 
 		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
+
+
+	/**
+	 * testMethodRule
+	 *
+	 * @param  req req
+	 * @param resp resp
+	 */
+	private void testMethodRule(HttpServletRequest req, HttpServletResponse resp){
+		//VariableCategoryValue variableCategoryValue = new VariableCategoryValue();
+		//variableCategoryValue.setVariableCategory("customers");
+		//Parameter parameter = BizUtils.buildVariableCategoryValueParameter("customers", Datatype.Object,variableCategoryValue);
+		Parameter parameter = BizUtils.buildVariableParameter("customers", Datatype.Object,"customers");
+		MethodLeftPart methodLeftPart = BizUtils.buildMethodLeftPart("myMethodTest", "printUser",  parameter);
+		Criteria orCriteria = Criteria.instance()
+				.setLeft(Left.instance(methodLeftPart))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("hello2"));
+		Or or = Or.instance().addCriterion(false, orCriteria);
+		Lhs lhs = Lhs.instance().setCriterion(or);
+
+		Rhs rhs = Rhs.instance();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("name");
+		variable.setName("name");
+		int i = RandomUtils.nextInt();
+		System.out.println("name="+"wpx" + i);
+		variable.setDefaultValue("wpx" + i);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.Integer);
+		variable2.setLabel("age");
+		variable2.setName("age");
+		variable2.setDefaultValue("25");
+		variables.add(variable2);
+
+		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			VariableLibrary variableLibrary = new VariableLibrary();
+			//依赖的变量->变量类型，只支持map结构
+			List<VariableCategory> variableCategories = new ArrayList<>();
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyCustomer");
+			variableCategory.setName("customers");
+			//variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+			variableLibrary.setVariableCategories(variableCategories);
+			variableCategoryLibs.add(variableLibrary);
+		}
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategoryLibs);
 		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
 		List<RuleInfo> firedRules=res.getFiredRules();
 		List<RuleInfo> matchedRules=res.getMatchedRules();
