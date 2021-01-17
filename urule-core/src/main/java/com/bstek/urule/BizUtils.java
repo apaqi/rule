@@ -159,7 +159,7 @@ public class BizUtils {
         variableValue.setVariableName(varName);
         variableValue.setVariableLabel(varName);
         variableValue.setDatatype(type);
-       // variableValue.setVariableCategory(varName);
+        variableValue.setVariableCategory(parName);
         parameter.setValue(variableValue);
         return parameter;
     }

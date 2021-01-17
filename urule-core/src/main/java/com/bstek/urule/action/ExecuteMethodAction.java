@@ -96,6 +96,8 @@ public class ExecuteMethodAction extends AbstractAction {
 						Object targetObj = newClass.newInstance();
 						BeanUtils.populate(targetObj, generalEntity);
 						convertedValues[i] = targetObj;
+					}else {
+						convertedValues[i] = o;
 					}
 				}
 				Object value=method.invoke(obj, convertedValues);

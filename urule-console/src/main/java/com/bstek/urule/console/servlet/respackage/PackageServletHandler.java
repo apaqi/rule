@@ -613,8 +613,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		//testRuleGroup(req, resp);
 		//testScriptMethodRule(req,  resp);
-		doTest_back(req,  resp);
-		//testMethodRule(req, resp);
+		//doTest_back(req,  resp);
+		testMethodRule(req, resp);
  		System.out.println();
 	}
 
@@ -1035,10 +1035,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 * @param resp resp
 	 */
 	private void testMethodRule(HttpServletRequest req, HttpServletResponse resp){
-		//VariableCategoryValue variableCategoryValue = new VariableCategoryValue();
-		//variableCategoryValue.setVariableCategory("customers");
-		//Parameter parameter = BizUtils.buildVariableCategoryValueParameter("customers", Datatype.Object,variableCategoryValue);
-		Parameter parameter = BizUtils.buildVariableParameter("customers", Datatype.Object,"customers");
+		VariableCategoryValue variableCategoryValue = new VariableCategoryValue();
+		variableCategoryValue.setVariableCategory("customers");
+		Parameter parameter = BizUtils.buildVariableCategoryValueParameter("customers", Datatype.Object,variableCategoryValue);
+		//Parameter parameter = BizUtils.buildVariableParameter("customers", Datatype.Object,"age");
 		MethodLeftPart methodLeftPart = BizUtils.buildMethodLeftPart("myMethodTest", "printUser",  parameter);
 		Criteria orCriteria = Criteria.instance()
 				.setLeft(Left.instance(methodLeftPart))

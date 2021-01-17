@@ -154,7 +154,6 @@ public class KnowledgeHelper implements ApplicationContextAware {
             List<Library> libraries = new ArrayList<>();
 
             Library library = new Library();
-            library.setPath("file://githubcode/rule/urule-core/src/main/resourceslibtest" );
             libraries.add(library);
             ruleSet.setLibraries(libraries);
             knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variableCategoryLibs);
