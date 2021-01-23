@@ -614,7 +614,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		//testRuleGroup(req, resp);
 		//testScriptMethodRule(req,  resp);
 		//doTest_back(req,  resp);
-		testMethodRule(req, resp);
+		//testCommonObjectParamMethodRule(req, resp);
+		testComplexObjectParamMethodRule(req, resp);
  		System.out.println();
 	}
 
@@ -700,7 +701,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			sb.append("，");
 			sb.append("匹配的规则共"+matchedRules.size()+"个");
 			if(matchedRules.size()>0){
-				buildRulesName(matchedRules, sb);				
+				buildRulesName(matchedRules, sb);
 			}
 			sb.append("；");
 			sb.append("触发的规则共"+firedRules.size()+"个");
@@ -711,7 +712,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		resultMap.put("data", variableCategories);
 		writeObjectToJson(resp, resultMap);
 	}
-	
+
 	private void buildObject(Object obj,Variable var){
 		String name=var.getName();
 		if(name.indexOf(".")!=-1){
@@ -945,7 +946,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			variableCategoryLibs.add(variableLibrary);
 		}
 
-		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null, null);
 		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
 		List<RuleInfo> firedRules=res.getFiredRules();
 		List<RuleInfo> matchedRules=res.getMatchedRules();
@@ -1020,7 +1021,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			variableCategoryLibs.add(variableLibrary);
 		}
 
-		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null,null);
 		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
 		List<RuleInfo> firedRules=res.getFiredRules();
 		List<RuleInfo> matchedRules=res.getMatchedRules();
@@ -1029,22 +1030,32 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
 
 	/**
-	 * testMethodRule
+	 * testMethodRule LRS入参是基本对象的场景（无子类场景，只一层对象结构）
 	 *
 	 * @param  req req
 	 * @param resp resp
 	 */
-	private void testMethodRule(HttpServletRequest req, HttpServletResponse resp){
+	private void testCommonObjectParamMethodRule(HttpServletRequest req, HttpServletResponse resp){
 		VariableCategoryValue variableCategoryValue = new VariableCategoryValue();
 		variableCategoryValue.setVariableCategory("customers");
 		Parameter parameter = BizUtils.buildVariableCategoryValueParameter("customers", Datatype.Object,variableCategoryValue);
-		//Parameter parameter = BizUtils.buildVariableParameter("customers", Datatype.Object,"age");
 		MethodLeftPart methodLeftPart = BizUtils.buildMethodLeftPart("myMethodTest", "printUser",  parameter);
 		Criteria orCriteria = Criteria.instance()
 				.setLeft(Left.instance(methodLeftPart))
-				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("hello2"));
-		Or or = Or.instance().addCriterion(false, orCriteria);
+				.setOp(Op.GreaterThen)
+				.setValue(SimpleValue.instance("10"));
+
+		VariableCategoryValue variableCategoryValue2 = new VariableCategoryValue();
+		variableCategoryValue2.setVariableCategory("customers");
+		//Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("customers2", Datatype.Object,variableCategoryValue);
+		Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("customers", Datatype.Object,variableCategoryValue);
+		MethodLeftPart methodLeftPart2 = BizUtils.buildMethodLeftPart("myMethodTest", "printUser",  parameter2);
+		Criteria orCriteria2 = Criteria.instance()
+				.setLeft(Left.instance(methodLeftPart2))
+				.setOp(Op.LessThen)
+				.setValue(SimpleValue.instance("10"));
+		Or or = Or.instance().addCriterion(false, orCriteria, orCriteria2);
+
 		Lhs lhs = Lhs.instance().setCriterion(or);
 
 		Rhs rhs = Rhs.instance();
@@ -1067,7 +1078,117 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		variable2.setType(Datatype.Integer);
 		variable2.setLabel("age");
 		variable2.setName("age");
-		variable2.setDefaultValue("25");
+		variable2.setDefaultValue(String.valueOf(RandomUtils.nextInt(40)));
+		variables.add(variable2);
+
+		List<VariableCategory> variableCategories = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			//依赖的变量->变量类型，只支持map结构
+
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyCustomer");
+			variableCategory.setName("customers");
+			//variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+		}
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategories, wrapperCommonObjectParamVariableLibrarys());
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
+
+	/**
+	 * testMethodRule LRS入参是复杂对象的场景（有子类场景，只支持两层对象结构）
+	 *
+	 * @param  req req
+	 * @param resp resp
+	 */
+	private void testComplexObjectParamMethodRule(HttpServletRequest req, HttpServletResponse resp){
+		VariableCategoryValue variableCategoryValue = new VariableCategoryValue();
+		variableCategoryValue.setVariableCategory("departments");
+		Parameter parameter = BizUtils.buildVariableCategoryValueParameter("departments", Datatype.Object,variableCategoryValue);
+		MethodLeftPart methodLeftPart = BizUtils.buildMethodLeftPart("myMethodTest", "printDepartment",  parameter);
+		Criteria orCriteria = Criteria.instance()
+				.setLeft(Left.instance(methodLeftPart))
+				.setOp(Op.GreaterThen)
+				.setValue(SimpleValue.instance("10"));
+
+		VariableCategoryValue variableCategoryValue2 = new VariableCategoryValue();
+		variableCategoryValue2.setVariableCategory("departments");
+		//Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("customers2", Datatype.Object,variableCategoryValue);
+		Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("departments", Datatype.Object,variableCategoryValue);
+		MethodLeftPart methodLeftPart2 = BizUtils.buildMethodLeftPart("myMethodTest", "printDepartment",  parameter2);
+		Criteria orCriteria2 = Criteria.instance()
+				.setLeft(Left.instance(methodLeftPart2))
+				.setOp(Op.LessThen)
+				.setValue(SimpleValue.instance("10"));
+		Or or = Or.instance().addCriterion(false, orCriteria, orCriteria2);
+
+		Lhs lhs = Lhs.instance().setCriterion(or);
+
+		Rhs rhs = Rhs.instance();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("myNewDept.myDepartmentManager.name");
+		variable.setName("myNewDept.myDepartmentManager.name");
+		int i = RandomUtils.nextInt();
+		variable.setDefaultValue("wpx" + i);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.Integer);
+		variable2.setLabel("myNewDept.myDepartmentManager.age");
+		variable2.setName("myNewDept.myDepartmentManager.age");
+		variable2.setDefaultValue(String.valueOf(RandomUtils.nextInt(30)));
+		variables.add(variable2);
+
+		List<VariableCategory> variableCategories = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			//依赖的变量->变量类型，只支持map结构
+
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyNewDept");
+			variableCategory.setName("departments");
+			//variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+		}
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategories, wrapperComplexObjectParamVariableLibrarys());
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
+
+	private List<VariableLibrary>  wrapperCommonObjectParamVariableLibrarys(){
+		// TODO: 2021/1/17
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("name");
+		variable.setName("name");
+		variable.setAct(Act.InOut);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.Integer);
+		variable2.setLabel("age");
+		variable2.setName("age");
+		variable2.setAct(Act.InOut);
 		variables.add(variable2);
 
 		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
@@ -1086,11 +1207,45 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			variableLibrary.setVariableCategories(variableCategories);
 			variableCategoryLibs.add(variableLibrary);
 		}
+		// TODO: 2021/1/17
+		return variableCategoryLibs;
+	}
 
-		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategoryLibs);
-		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
-		List<RuleInfo> firedRules=res.getFiredRules();
-		List<RuleInfo> matchedRules=res.getMatchedRules();
-		System.out.println();
+
+	private List<VariableLibrary>  wrapperComplexObjectParamVariableLibrarys(){
+		// TODO: 2021/1/17
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("myDepartmentManager.name");
+		variable.setName("myDepartmentManager.name");
+		variable.setAct(Act.InOut);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.Integer);
+		variable2.setLabel("myDepartmentManager.age");
+		variable2.setName("myDepartmentManager.age");
+		variable2.setAct(Act.InOut);
+		variables.add(variable2);
+
+		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			VariableLibrary variableLibrary = new VariableLibrary();
+			//依赖的变量->变量类型，只支持map结构
+			List<VariableCategory> variableCategories = new ArrayList<>();
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyNewDept");
+			variableCategory.setName("departments");
+			//variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+			variableLibrary.setVariableCategories(variableCategories);
+			variableCategoryLibs.add(variableLibrary);
+		}
+		// TODO: 2021/1/17
+		return variableCategoryLibs;
 	}
 }

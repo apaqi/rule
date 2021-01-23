@@ -12,7 +12,7 @@ public class Dept {
     @Label("部门名称")
     private String deptName;
     @Label("部门经理")
-    private String deptManager;
+    private DeptManager deptManager ;
     @Label("部门人员数")
     private Integer deptNum;
 

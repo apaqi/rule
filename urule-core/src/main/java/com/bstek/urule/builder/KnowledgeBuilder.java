@@ -204,47 +204,14 @@ public class KnowledgeBuilder extends AbstractBuilder {
      * @param  variableCategoryLibs2 variableCategoryLibs
      * @return KnowledgeBase KnowledgeBase
      */
-    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<VariableLibrary> variableCategoryLibs2) {
+    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<VariableLibrary> variableCategoryLibs) {
         List<Rule> rules = new ArrayList<Rule>();
         if (ruleSet.getRules() != null) {
             rules.addAll(ruleSet.getRules());
         }
         List<ActionConfig> actionConfigs2 = this.buildActionConfigs(ruleSet);
 
-        // TODO: 2021/1/17
-        List<Variable> variables = new ArrayList<>();
-        Variable variable = new Variable();
-        variable.setType(Datatype.String);
-        variable.setLabel("name");
-        variable.setName("name");
-        variable.setAct(Act.InOut);
-        variables.add(variable);
 
-        Variable variable2 = new Variable();
-        variable2.setType(Datatype.Integer);
-        variable2.setLabel("age");
-        variable2.setName("age");
-        variable2.setAct(Act.InOut);
-        variables.add(variable2);
-
-        List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
-        if(!CollectionUtils.isEmpty(variables)) {
-            //依赖的变量
-            VariableLibrary variableLibrary = new VariableLibrary();
-            //依赖的变量->变量类型，只支持map结构
-            List<VariableCategory> variableCategories = new ArrayList<>();
-            VariableCategory variableCategory = new VariableCategory();
-            variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyCustomer");
-            variableCategory.setName("customers");
-            //variableCategory.setType(CategoryType.Clazz);
-            //依赖的变量->变量信息
-            variableCategory.setVariables(variables);
-            variableCategories.add(variableCategory);
-            variableLibrary.setVariableCategories(variableCategories);
-            variableCategoryLibs.add(variableLibrary);
-        }
-        //此处代码需要优化
-        // TODO: 2021/1/17
         ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs2, variableCategoryLibs);
         //todo 同一个规则集，resourceLibrary 可以缓存
         Rete rete = reteBuilder.buildRete(rules, resourceLibrary);

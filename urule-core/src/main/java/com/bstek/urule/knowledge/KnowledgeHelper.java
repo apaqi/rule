@@ -49,14 +49,14 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @author wpx
      * @since  2020/12/29 14:09
      */
-    public ExecutionResponse execute(String ruleId, Lhs lhs, List<VariableLibrary> variableCategoryLibs) {
+    public ExecutionResponse execute(String ruleId, Lhs lhs, List<VariableCategory> variableCategories, List<VariableLibrary> variableCategoryLibs) {
         Rhs rhs = Rhs.instance();
         rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
 
         Other other = new Other();
         other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
 
-        return execute(ruleId, lhs, other, rhs, variableCategoryLibs);
+        return execute(ruleId, lhs, other, rhs, variableCategories, variableCategoryLibs);
     }
 
 
@@ -71,13 +71,13 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @return com.bstek.urule.runtime.response.ExecutionResponse ExecutionResponse
      * @since  2020/12/29 14:09
      */
-    public ExecutionResponse execute(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
-        KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, null);
+    public ExecutionResponse execute(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableCategory> variableCategories, List<VariableLibrary> variableCategoryLibs) {
+        KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, variableCategoryLibs);
         KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
         //构造树
         KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
         //Map<VariableCategory, Object> facts = buildFacts(knowledgeBase);
-        Map<VariableCategory, Object> facts = buildFacts(variableCategoryLibs);
+        Map<VariableCategory, Object> facts = buildFacts(variableCategories);
         Map<String, Object> parameters = null;
         for (Object obj : facts.values()) {
             if (!(obj instanceof GeneralEntity) && (obj instanceof HashMap)) {
@@ -99,12 +99,11 @@ public class KnowledgeHelper implements ApplicationContextAware {
     /**
      * 构造参数
      *
-     * @param variableCategoryLibs variableCategoryLibs
+     * @param variableCategories variableCategories
      * @return Map Map
      */
-    private Map<VariableCategory, Object> buildFacts(List<VariableLibrary> variableCategoryLibs) {
+    private Map<VariableCategory, Object> buildFacts(List<VariableCategory> variableCategories) {
         Map<VariableCategory, Object> facts = new HashMap<VariableCategory, Object>();
-        List<VariableCategory> variableCategories = variableCategoryLibs.get(0).getVariableCategories();//knowledgeBase.getResourceLibrary().getVariableCategories();
         for (VariableCategory vc : variableCategories) {
             String clazz = vc.getClazz();
             Object entity = null;

@@ -17,6 +17,9 @@ package com.bstek.urule.model.rule;
 
 import com.bstek.urule.RuleException;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月25日
@@ -167,5 +170,33 @@ public enum Op {
 			return NotContain;
 		}
 		throw new RuleException("Unsupport op "+op+"");
+	}
+
+	private final static Set<Op> compareType = new HashSet<>();
+	private final static Set<com.bstek.urule.model.rule.Op> collentType = new HashSet<>();
+
+	static {
+		compareType.add(com.bstek.urule.model.rule.Op.Equals);
+		compareType.add(com.bstek.urule.model.rule.Op.EqualsIgnoreCase);
+		compareType.add(com.bstek.urule.model.rule.Op.NotEquals);
+		compareType.add(com.bstek.urule.model.rule.Op.NotEqualsIgnoreCase);
+		compareType.add(com.bstek.urule.model.rule.Op.LessThen);
+		compareType.add(com.bstek.urule.model.rule.Op.LessThenEquals);
+		compareType.add(com.bstek.urule.model.rule.Op.GreaterThen);
+		compareType.add(com.bstek.urule.model.rule.Op.GreaterThenEquals);
+
+		collentType.add(com.bstek.urule.model.rule.Op.In);
+		collentType.add(com.bstek.urule.model.rule.Op.NotIn);
+		collentType.add(com.bstek.urule.model.rule.Op.Contain);
+		collentType.add(com.bstek.urule.model.rule.Op.NotContain);
+
+	}
+
+	public static boolean isBaseType(com.bstek.urule.model.rule.Op op){
+		return compareType.contains(op);
+	}
+
+	public static boolean isCollectType(com.bstek.urule.model.rule.Op op){
+		return collentType.contains(op);
 	}
 }

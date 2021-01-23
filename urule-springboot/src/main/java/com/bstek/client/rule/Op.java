@@ -17,6 +17,9 @@ package com.bstek.client.rule;
 
 import com.bstek.urule.RuleException;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月25日

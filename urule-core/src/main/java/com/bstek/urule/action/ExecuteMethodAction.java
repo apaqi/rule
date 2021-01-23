@@ -15,14 +15,12 @@
  ******************************************************************************/
 package com.bstek.urule.action;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.alibaba.fastjson.JSON;
 import com.bstek.urule.RuleException;
 import com.bstek.urule.Utils;
 import com.bstek.urule.debug.MsgType;
@@ -52,7 +50,7 @@ public class ExecuteMethodAction extends AbstractAction {
 			java.lang.reflect.Method method=null;
 			if(parameters!=null && parameters.size()>0){
 				ParametersWrap wrap=buildParameterClasses(context,matchedObject,allMatchedObjects,variableMap);
-				Method[] methods=obj.getClass().getMethods();
+				Method[] methods=obj.getClass().getDeclaredMethods();
 				Datatype[] targetDatatypes=wrap.getDatatypes();
 				boolean match=false;
 				for(Method m:methods){
@@ -93,9 +91,12 @@ public class ExecuteMethodAction extends AbstractAction {
 						GeneralEntity generalEntity = (GeneralEntity)o;
 						String targetClass = generalEntity.getTargetClass();
 						Class newClass = Class.forName(targetClass);
-						Object targetObj = newClass.newInstance();
+						/*Object targetObj = newClass.newInstance();
 						BeanUtils.populate(targetObj, generalEntity);
-						convertedValues[i] = targetObj;
+						convertedValues[i] = targetObj;*/
+						Object o1 = map2Bean(generalEntity, newClass);
+						convertedValues[i] = o1;
+
 					}else {
 						convertedValues[i] = o;
 					}
@@ -293,6 +294,60 @@ public class ExecuteMethodAction extends AbstractAction {
 	}
 	public ActionType getActionType() {
 		return actionType;
+	}
+
+
+
+	/**
+	 * map转bean
+	 * @param source   map属性
+	 * @param instance 要转换成的备案
+	 * @return 该bean
+	 */
+	public  Object map2Bean(Map<String, Object> source, Class instance) throws Exception{
+		Map<String, Field> fieldMap = new HashMap<>();
+		Object parentObject = instance.newInstance();
+		try {
+			Object object = instance.newInstance();
+			Field[] fields = object.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				field.setAccessible(true);
+				fieldMap.put(field.getName(), field);
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return wrapperFields(parentObject, source, fieldMap);
+	}
+
+	private Object wrapperFields(Object parentObject, Map<String, Object> source, Map<String, Field> fieldMap) throws Exception{
+		for(Map.Entry<String, Object> entry : source.entrySet()) {
+			String key = entry.getKey();
+			Object value = entry.getValue();
+			if(value instanceof GeneralEntity) {//有子类场景
+				if(parentObject.getClass().getSimpleName().equalsIgnoreCase(key)) {
+					//存在子类的场景
+					if(value instanceof GeneralEntity) {
+						return wrapperFields( parentObject,  (GeneralEntity)value,  fieldMap);
+					}else {//无子类场景
+						BeanUtils.populate(parentObject, source);
+						return parentObject;
+					}
+				}else if (fieldMap.containsKey(key)) {
+					Field field = fieldMap.get(key);
+					Class<?> type = field.getType();
+					if(parentObject.getClass() != type) {
+						Object targetObj = type.newInstance();
+						BeanUtils.populate(targetObj, (GeneralEntity)value);
+						field.set(parentObject, targetObj);
+					}
+				}
+			}else {//无子类场景
+				BeanUtils.populate(parentObject, source);
+				return parentObject;
+			}
+		}
+		return parentObject;
 	}
 }
 

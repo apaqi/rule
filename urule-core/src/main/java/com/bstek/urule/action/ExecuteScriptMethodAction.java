@@ -52,7 +52,7 @@ public class ExecuteScriptMethodAction extends AbstractAction {
             java.lang.reflect.Method method = null;
             if (parameters != null && parameters.size() > 0) {
                 ScriptParametersWrap wrap = buildParameterClasses(context, matchedObject, allMatchedObjects, variableMap);
-                Method[] methods = obj.getClass().getMethods();
+                Method[] methods = obj.getClass().getDeclaredMethods();
                 Datatype[] targetDatatypes = wrap.getDatatypes();
                 boolean match = false;
                 for (Method m : methods) {

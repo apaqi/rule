@@ -90,7 +90,7 @@ public class BuiltInActionLibraryBuilder implements ApplicationContextAware{
 		SpringBean bean=new SpringBean();
 		bean.setId(name);
 		bean.setName(name);
-		bean.setMethods(buildConsumerMethod(obj.getClass().getMethods()));
+		bean.setMethods(buildConsumerMethod(obj.getClass().getDeclaredMethods()));
 		builtInActions.add(bean);
 		return builtInActions;
 	}

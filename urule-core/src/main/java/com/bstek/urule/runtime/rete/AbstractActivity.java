@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Jacky.gao
@@ -49,11 +50,17 @@ public abstract class AbstractActivity implements Activity {
         }
         List<FactTracker> trackers = null;
         int size = paths.size();
-        int exceptionCount = 0;
+        Map<Integer,Integer> orExceptionData = new ConcurrentHashMap<>();
+        Map<Integer,Integer> orSuccessData = new ConcurrentHashMap<>();
         for (int i = 0; i < size; i++) {
             Path path = paths.get(i);
             Collection<FactTracker> results = null;
             Activity activity = path.getTo();
+            Junction parent = null;
+            if(activity instanceof CriteriaActivity) {
+                parent = ((CriteriaActivity) activity).getCriteria().getParent();
+            }
+            int parentHashCode = System.identityHashCode(parent);
             path.setPassed(true);
             if (size > 0) {
                 Map<String, Object> newVariableMap = new HashMap<String, Object>();
@@ -64,38 +71,42 @@ public abstract class AbstractActivity implements Activity {
                 try {
                     results = activity.enter(context, obj, tracker.newSubFactTracker(), newVariableMap);
                 } catch (Exception e) {
-                    Junction parent = ((CriteriaActivity) activity).getCriteria().getParent();
+                    //Junction parent = ((CriteriaActivity) activity).getCriteria().getParent();
                     if(parent instanceof And) {
                         throw new RuleException("规则校验异常！");
                     }
-                    int parentHashCode = System.identityHashCode(((CriteriaActivity) activity).getCriteria().getParent());
-                    int nextPathParentHashCode = getNextPathObjAddress(i, size);
-                    //Junction junction = parsePath(parent);
-                    //int childNum = countChildNum(junction.getCriterions(), 0);
-                    exceptionCount ++;
-                    if (parent instanceof Or
-                            //方案一：如果存在“或”条件为false，且无条件为true场景下，有条件异常时，应该返回异常
-                            && parentHashCode != nextPathParentHashCode) {
-                        if (parent.getParent() instanceof Or && null == context.getPrevActivity()) {
-                            throw new RuleException("规则校验异常！");
-                        }
-                        /*
-                        //方案二：全部“或”条件异常，才抛出异常
-                        if (parent.getParent() instanceof Or && exceptionCount == childNum) {
-                            throw new RuleException("规则校验异常！");
-                        }*/
-
+                    if (parent instanceof Or){
+                        orExceptionData.put(parentHashCode,parentHashCode);
                     }
                 }
-
             } else {
                 results = activity.enter(context, obj, tracker, variableMap);
             }
-            if (results != null) {
+            if (results != null) {//match 场景
+                if(parent instanceof Or) {
+                    orSuccessData.put(parentHashCode,parentHashCode);
+                }
+                //check
+                int nextPathParentHashCode = getNextPathObjAddress(i, size);
+                if(null != parent && parent instanceof Or && (null == parent.getParent() || parentHashCode != nextPathParentHashCode) ) {
+                    if (orExceptionData.containsKey(parentHashCode) && !orSuccessData.containsKey(parentHashCode)) {
+                        throw new RuleException("规则校验异常！");
+                    }
+                }
                 if (trackers == null) {
                     trackers = new ArrayList<FactTracker>();
                 }
                 trackers.addAll(results);
+            }else {//mismatch 场景
+                int nextPathParentHashCode = getNextPathObjAddress(i, size);
+                //null == parent.getParent() && parent.getCriterions().size() -1 == i 单层或条件组，最后一个条件判断
+                //parentHashCode != nextPathParentHashCode 多层或条件组，最后一个条件判断
+                if(null != parent && parent instanceof Or && ((null == parent.getParent() && parent.getCriterions().size() -1 == i) || parentHashCode != nextPathParentHashCode) ) {
+                    if (orExceptionData.containsKey(parentHashCode) && !orSuccessData.containsKey(parentHashCode)) {
+                        throw new RuleException("规则校验异常！");
+                    }
+                }
+
             }
         }
         return trackers;

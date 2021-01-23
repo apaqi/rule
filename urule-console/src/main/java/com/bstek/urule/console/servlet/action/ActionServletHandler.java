@@ -63,7 +63,7 @@ public class ActionServletHandler extends RenderPageServletHandler{
 		Object o=applicationContext.getBean(beanId);
 		Object bean=getTarget(o);
 		List<Method> list=new ArrayList<Method>();
-		java.lang.reflect.Method[] methods=bean.getClass().getMethods();
+		java.lang.reflect.Method[] methods=bean.getClass().getDeclaredMethods();
 		for(java.lang.reflect.Method m:methods){
 			ExposeAction action=m.getAnnotation(ExposeAction.class);
 			if(action==null){
