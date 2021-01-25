@@ -1,3 +1,4 @@
+/*
 package com.bstek.urule.console.servlet.respackage;
 
 import com.alibaba.fastjson.JSON;
@@ -78,7 +79,8 @@ public class RecursionObject {
 
     }
 
-    /**
+    */
+/**
      * 方法一：利用递归遍历
      * 用途：从复杂对象中递归遍历，获取string类型的目标属性名的值
      * 适用条件：该复杂对象中如果存在多个目标属性targetProName，遍历到第一个atargetProName则退出遍历
@@ -90,7 +92,8 @@ public class RecursionObject {
      * @param object 复杂对象
      * @param targetProName  目标属性名
      * @return
-     */
+     *//*
+
     public static  Map<String,Object> recursionLoopThroughObj(Object object,String targetProName){
         Map<String,Object> resultMap = new HashMap<>();
         Class clazz = null;
@@ -209,11 +212,13 @@ public class RecursionObject {
         return resultMap;
     }
 
-    /**
+    */
+/**
      * 检查object是否为java的基本数据类型/包装类/java.util.Date/java.sql.Date
      * @param object
      * @return
-     */
+     *//*
+
     public static boolean checkObjectIsSysType(Object object){
         String objType = object.getClass().toString();
         if ("byte".equals(objType) || "short".equals(objType) || "int".equals(objType)|| "long".equals(objType)|| "double".equals(objType) || "float".equals(objType) || "boolean".equals(objType)){
@@ -226,14 +231,16 @@ public class RecursionObject {
 
     }
 
-    /**
+    */
+/**
      * 方法二：从复杂对象中获取string类型的目标属性targetProName的值
      * 把对象转换成json字符串，然后截取第一次出现的targetProName的值
      * 适用条件：同方法一
      * @param object 复杂对象
      * @param targetProName 目标属性
      * @return
-     */
+     *//*
+
     public static String getBusinessNoFromArg(Object object,String targetProName){
         String jsonString = JSON.toJSONString(object);
         System.err.println("jsonString=" + jsonString);
@@ -243,3 +250,4 @@ public class RecursionObject {
     }
 
 }
+*/

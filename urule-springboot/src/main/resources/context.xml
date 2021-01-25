@@ -12,4 +12,5 @@
 	<bean id="deptActionTest" class="com.bstek.library.action.DeptActionTest"/>
 	<bean id="deptActionTest1" class="com.bstek.library.action.DeptActionTest"/>
 	<bean id="myMethodTest" class="com.bstek.urule.console.wpxtest.actions.MyMethodTest"/>
+	<bean id="myDeptActionTest" class="com.bstek.urule.console.wpxtest.actions.MyDeptActionTest"/>
 </beans>

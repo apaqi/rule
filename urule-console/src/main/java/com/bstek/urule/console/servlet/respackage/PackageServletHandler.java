@@ -26,8 +26,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
 import com.bstek.urule.BizUtils;
 import com.bstek.urule.console.DefaultUser;
+import com.bstek.urule.console.wpxtest.vars.MyDepartmentManager;
 import com.bstek.urule.knowledge.KnowledgeHelper;
 import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.variable.*;
@@ -615,7 +617,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		//testScriptMethodRule(req,  resp);
 		//doTest_back(req,  resp);
 		//testCommonObjectParamMethodRule(req, resp);
-		testComplexObjectParamMethodRule(req, resp);
+		//testComplexObjectParamMethodRule(req, resp);
+		testMultipleParamMethodRule(req, resp);
+
  		System.out.println();
 	}
 
@@ -1122,7 +1126,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		variableCategoryValue2.setVariableCategory("departments");
 		//Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("customers2", Datatype.Object,variableCategoryValue);
 		Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("departments", Datatype.Object,variableCategoryValue);
-		MethodLeftPart methodLeftPart2 = BizUtils.buildMethodLeftPart("myMethodTest", "printDepartment",  parameter2);
+		MethodLeftPart methodLeftPart2 = BizUtils.buildMethodLeftPart("myDeptActionTest", "printDepts",  parameter2);
 		Criteria orCriteria2 = Criteria.instance()
 				.setLeft(Left.instance(methodLeftPart2))
 				.setOp(Op.LessThen)
@@ -1150,7 +1154,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		variable2.setType(Datatype.Integer);
 		variable2.setLabel("myNewDept.myDepartmentManager.age");
 		variable2.setName("myNewDept.myDepartmentManager.age");
-		variable2.setDefaultValue(String.valueOf(RandomUtils.nextInt(30)));
+		variable2.setDefaultValue("5");//String.valueOf(RandomUtils.nextInt(30))
 		variables.add(variable2);
 
 		List<VariableCategory> variableCategories = new ArrayList<>();
@@ -1245,6 +1249,177 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			variableLibrary.setVariableCategories(variableCategories);
 			variableCategoryLibs.add(variableLibrary);
 		}
+		// TODO: 2021/1/17
+		return variableCategoryLibs;
+	}
+
+
+	/**
+	 * testMethodRule LRS入参是多参数场景
+	 *
+	 * @param  req req
+	 * @param resp resp
+	 */
+	private void testMultipleParamMethodRule(HttpServletRequest req, HttpServletResponse resp){
+		VariableCategoryValue variableCategoryValue = new VariableCategoryValue();
+		variableCategoryValue.setVariableCategory("departments");
+
+		/*VariableCategoryValue mapCategoryValue = new VariableCategoryValue();
+		mapCategoryValue.setVariableCategory("map");*/
+
+		//对象类型参数，需要自己定义类型
+		Parameter parameter = BizUtils.buildVariableCategoryValueParameter("departments", Datatype.Object,variableCategoryValue);
+		//参数类型
+		Parameter conpamy = BizUtils.buildParameterValueParameter("company", Datatype.String, "company");
+		Parameter parameter3 = BizUtils.buildParameterValueParameter("extMap", Datatype.Map, "extMap");
+		MethodLeftPart methodLeftPart = BizUtils.buildMethodLeftPart("myDeptActionTest", "printDepartmentManager",  parameter, conpamy, parameter3);
+		Criteria orCriteria = Criteria.instance()
+				.setLeft(Left.instance(methodLeftPart))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+
+		VariableCategoryValue variableCategoryValue2 = new VariableCategoryValue();
+		variableCategoryValue2.setVariableCategory("departments");
+		Parameter parameter2 = BizUtils.buildVariableCategoryValueParameter("departments", Datatype.Object,variableCategoryValue);
+		MethodLeftPart methodLeftPart2 = BizUtils.buildMethodLeftPart("myDeptActionTest", "printDepartmentManager",  parameter2);
+		Criteria orCriteria2 = Criteria.instance()
+				.setLeft(Left.instance(methodLeftPart2))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+		Or or = Or.instance().addCriterion(false, orCriteria, orCriteria2);
+
+		Lhs lhs = Lhs.instance().setCriterion(or);
+
+		Rhs rhs = Rhs.instance();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("name");
+		variable.setName("name");
+		int i = RandomUtils.nextInt();
+		variable.setDefaultValue("wpx" + i);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.Integer);
+		variable2.setLabel("age");
+		variable2.setName("age");
+		variable2.setDefaultValue(String.valueOf(RandomUtils.nextInt(30)));
+		variables.add(variable2);
+
+		List<VariableCategory> variableCategories = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			//依赖的变量->变量类型，只支持map结构
+
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyDepartmentManager");
+			variableCategory.setName("departments");
+			//variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+		}
+		//参数类型参数
+		VariableCategory companyVariableCategory = new VariableCategory();
+		companyVariableCategory.setClazz("java.util.HashMap");
+		companyVariableCategory.setName(VariableCategory.PARAM_CATEGORY);
+		List<Variable> companyVariables = new ArrayList<>();
+		Variable company = new Variable();
+		company.setType(Datatype.String);
+		company.setLabel("company");
+		company.setName("company");
+		company.setDefaultValue("companyrrr");
+		companyVariables.add(company);
+		//todo
+		Variable map = new Variable();
+		map.setType(Datatype.Object);
+		map.setLabel("extMap");
+		map.setName("extMap");
+		//todo  map类型参数不支持对象类型
+		//MyDepartmentManager myDepartmentManager = new MyDepartmentManager();
+		//myDepartmentManager.setName("wpx");
+		//myDepartmentManager.setAge(30);
+		Map map1 = new HashMap(){{
+			put("11","22");
+			//put("223",myDepartmentManager);
+		}};
+		map.setDefaultValue(JSON.toJSONString(map1));
+		companyVariables.add(map);
+		companyVariableCategory.setVariables(companyVariables);
+		variableCategories.add(companyVariableCategory);
+
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategories, wrapperComplexObjectParamVariableLibrarys2());
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
+
+	private List<VariableLibrary>  wrapperComplexObjectParamVariableLibrarys2(){
+		// TODO: 2021/1/17
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("name");
+		variable.setName("name");
+		variable.setAct(Act.InOut);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.Integer);
+		variable2.setLabel("age");
+		variable2.setName("age");
+		variable2.setAct(Act.InOut);
+		variables.add(variable2);
+
+		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			VariableLibrary variableLibrary = new VariableLibrary();
+			//依赖的变量->变量类型，只支持map结构
+			List<VariableCategory> variableCategories = new ArrayList<>();
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("com.bstek.urule.console.wpxtest.vars.MyDepartmentManager");
+			variableCategory.setName("departments");
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+
+			//构造company参数
+			List<Variable> paramsVariables = new ArrayList<>();
+			Variable company = new Variable();
+			company.setType(Datatype.String);
+			company.setLabel("company");
+			company.setName("company");
+			company.setAct(Act.InOut);
+			paramsVariables.add(company);
+
+			//map参数
+			Variable map = new Variable();
+			map.setType(Datatype.Object);
+			map.setLabel("extMap");
+			map.setName("extMap");
+			map.setAct(Act.InOut);
+			paramsVariables.add(map);
+
+			//company
+			VariableCategory paramVariableCategory = new VariableCategory();
+			paramVariableCategory.setClazz("java.util.HashMap");
+			paramVariableCategory.setName("参数");
+			//依赖的变量->变量信息
+			paramVariableCategory.setVariables(paramsVariables);
+			variableCategories.add(paramVariableCategory);
+			variableLibrary.setVariableCategories(variableCategories);
+			variableCategoryLibs.add(variableLibrary);
+		}
+
 		// TODO: 2021/1/17
 		return variableCategoryLibs;
 	}

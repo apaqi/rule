@@ -165,6 +165,25 @@ public class BizUtils {
     }
 
     /**
+     * 构建参数行参数信息
+     *
+     * @param parName parName
+     * @param type    type
+     * @param varName varName
+     * @return Parameter Parameter
+     */
+    public static Parameter buildParameterValueParameter(String parName, Datatype type, String varName) {
+        Parameter parameter = new Parameter();
+        parameter.setName(parName);
+        parameter.setType(type);
+        ParameterValue parameterValue = new ParameterValue();
+        parameterValue.setVariableName(varName);
+        parameterValue.setVariableLabel(varName);
+        parameter.setValue(parameterValue);
+        return parameter;
+    }
+
+    /**
      * 构建变量参数
      *
      * @param parName parName
