@@ -229,6 +229,11 @@ public class RuleUtils {
                 List<BizReq> bizReqsParam = new ArrayList<>();
                 bizReqsParam.add(bizReqObj);
                 String source = MapUtils.getString(para, "source");
+                Map<String, Object> sourceMap = JSON.parseObject(source, Map.class);
+                String beanId = MapUtils.getString(sourceMap, "beanId");
+                String methodName = MapUtils.getString(sourceMap, "methodName");
+                String result = MapUtils.getString(sourceMap, "result");
+                JSONArray params = (JSONArray)MapUtils.getObject(sourceMap, "params");
 
                 RpcBizEnum rpcBizEnum = RpcBizEnum.getByCode(MapUtils.getString(para, "bizType"));
                 Parameter bizReqs = BizUtils.buildComplexObjectValueParameter("bizReqs", Datatype.List, bizReqsParam);
