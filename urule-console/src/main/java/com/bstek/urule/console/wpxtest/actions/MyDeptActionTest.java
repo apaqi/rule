@@ -6,9 +6,10 @@ import com.bstek.urule.console.wpxtest.vars.MyDepartmentManager;
 import com.bstek.urule.console.wpxtest.vars.MyDept;
 import com.bstek.urule.console.wpxtest.vars.MyNewDept;
 import com.bstek.urule.model.ExposeAction;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
+@Component
 public class MyDeptActionTest {
     @ActionId("deptAction")
     public String deptAction() {

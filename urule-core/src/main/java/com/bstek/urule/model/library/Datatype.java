@@ -38,6 +38,17 @@ import com.bstek.urule.Utils;
  */
 public enum Datatype {
 	String,Integer,Char,Double,Long,Float,BigDecimal,Boolean,Date,List,Set,Map,Enum,Object;
+
+	public final static Map<String,Datatype> DATATYPE_MAP = new HashMap<>(14);
+	static {
+		for(Datatype datatype : Datatype.values()) {
+			DATATYPE_MAP.put(datatype.name(), datatype);
+		}
+	}
+
+	public static Datatype getByName(String name){
+		return DATATYPE_MAP.get(name);
+	}
 	public String convertObjectToString(Object value){
 		if(value==null){
 			return "";

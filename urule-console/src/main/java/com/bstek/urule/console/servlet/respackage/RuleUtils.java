@@ -220,44 +220,40 @@ public class RuleUtils {
 
     private static List<Criterion> getCriteria(List<Criterion> junctions, Map<String, Object> extentionParam, Map<String, Object> responseParam, List<JSONObject> list, Criterion junction, List<Criterion> criterias) {
         for (JSONObject para : list) {
-            //4、解析多重条件
             if (para.containsKey("rule")) {
                 junctions = parseCriterions(para, false, junction, junctions, extentionParam, responseParam);
             } else {
-                RuleMetaData ruleMetaData = JSONObject.parseObject(JSON.toJSONString(para), RuleMetaData.class);
-                BizReq bizReqObj = JSONObject.parseObject(JSON.toJSONString(para), BizReq.class);
-                List<BizReq> bizReqsParam = new ArrayList<>();
-                bizReqsParam.add(bizReqObj);
+                String conditionIndex = MapUtils.getString(para, "conditionIndex");
+                String expectedValue = MapUtils.getString(para, "expectedValue");
+
                 String source = MapUtils.getString(para, "source");
                 Map<String, Object> sourceMap = JSON.parseObject(source, Map.class);
+                //todo 需要从玲珑塔匹配
                 String beanId = MapUtils.getString(sourceMap, "beanId");
                 String methodName = MapUtils.getString(sourceMap, "methodName");
                 String result = MapUtils.getString(sourceMap, "result");
-                JSONArray params = (JSONArray)MapUtils.getObject(sourceMap, "params");
-
-                RpcBizEnum rpcBizEnum = RpcBizEnum.getByCode(MapUtils.getString(para, "bizType"));
-                Parameter bizReqs = BizUtils.buildComplexObjectValueParameter("bizReqs", Datatype.List, bizReqsParam);
-                Parameter extention = BizUtils.buildComplexObjectValueParameter("extention", Datatype.Map, extentionParam);
-                Parameter response = BizUtils.buildComplexObjectValueParameter("response", Datatype.Map, responseParam);
+                String operator = MapUtils.getString(sourceMap, "operator","==");
+                Parameter[] params = buildParameters(sourceMap);
+                Map<String, Object> resultMap = JSON.parseObject(result, Map.class);
                 //后期针对控件依赖的资源做资源化管理
-                if (isNeedScript(getHandleBeanId(rpcBizEnum, bizReqObj.getBizParam()))) {
-                    ScriptMethodLeftPart scriptMethodLeftPart = BizUtils.buildScriptMethodLeftPart(rpcBizEnum.getHandleBeanId(), "bizData", ScriptType.JSONPATH, "$." + bizReqObj.getMvelKey(), bizReqs, extention, response);
-                    Op op = RuleUtils.convert2RuleOperator(bizReqObj.getMvelOper());
-                    if (isNeedConvert2InOp(op, bizReqObj)) {
+                if (MapUtils.isNotEmpty(resultMap) && isNeedScript(resultMap)) {
+                    ScriptMethodLeftPart scriptMethodLeftPart = BizUtils.buildScriptMethodLeftPart(beanId, methodName, ScriptType.JSONPATH, "$." + expectedValue, params);
+                    Op op = RuleUtils.convert2RuleOperator(operator);
+                    if (isNeedConvert2InOp(op, expectedValue)) {
                         op = Op.In;
                     }
                     Criteria criteria = Criteria.instance()
                             .setLeft(Left.instance(scriptMethodLeftPart))
                             .setOp(op)
-                            .setValue(buildValue(op, bizReqObj));
+                            .setValue(buildValue(op, expectedValue));
                     criterias.add(criteria);
                 } else {
-                    MethodLeftPart leftPart = BizUtils.buildMethodLeftPart(rpcBizEnum.getHandleBeanId(), "bizData", bizReqs, extention, response);
-                    Op op = RuleUtils.convert2RuleOperator(bizReqObj.getMvelOper());
+                    MethodLeftPart leftPart = BizUtils.buildMethodLeftPart(beanId, methodName, params);
+                    Op op = RuleUtils.convert2RuleOperator(operator);
                     Criteria criteria = Criteria.instance()
                             .setLeft(Left.instance(leftPart))
                             .setOp(op)
-                            .setValue(buildValue(op, bizReqObj));
+                            .setValue(buildValue(op, expectedValue));
                     criterias.add(criteria);
                 }
             }
@@ -265,11 +261,25 @@ public class RuleUtils {
         return junctions;
     }
 
+    private static Parameter[] buildParameters(Map<String, Object> sourceMap) {
+        JSONArray params = (JSONArray) MapUtils.getObject(sourceMap, "params");
+        int len = params.size();
+        Parameter[] parameters = new Parameter[len];
+        for (int i = 0; i < len; i++) {
+            JSONObject o = (JSONObject) params.get(i);
+            String dataType = o.getString("dataType");
+            String paramName = o.getString("paramName");
+            String value = o.getString("value");
+            parameters[i] = BizUtils.buildSimpleParameter(paramName, Datatype.getByName(dataType), value);
+        }
+        return parameters;
+    }
+
     /**
      * @param type
      * @return com.bstek.urule.model.rule.Op
      * @Description 将molo操作符转换为规则组件操作符
-     * @Author wangpeixuaninfo@jd.com
+     * @Author wpx
      * @Date 2021/1/7 18:05
      */
 
@@ -283,16 +293,15 @@ public class RuleUtils {
 
     /**
      * @param op
-     * @param bizReq
+     * @param mvelValue
      * @return com.bstek.urule.model.rule.Value
      * @Description 构造Value对象
-     * @Author wangpeixuaninfo@jd.com
+     * @Author wpx
      * @Date 2021/1/7 18:05
      */
 
 
-    private static Value buildValue(Op op, BizReq bizReq) {
-        Object mvelValue = bizReq.getMvelValue();
+    private static Value buildValue(Op op, String mvelValue) {
         if (mvelValue instanceof String) {
             String valueStr = (String) mvelValue;
             if (StringUtils.isBlank((String) mvelValue)) {
@@ -310,7 +319,7 @@ public class RuleUtils {
                 return SimpleValue.instance(valueStr);
             }
         } else {
-            if (Op.In == op && mvelValue instanceof JSONArray) {
+            /*if (Op.In == op && mvelValue instanceof JSONArray) {
                 Object[] valueArr = ((JSONArray) mvelValue).toArray();
                 List<Object> vals = new ArrayList<>(valueArr.length);
                 for (int i = 0, len = valueArr.length; i < len; i++) {
@@ -319,35 +328,34 @@ public class RuleUtils {
                 return ComplexObjectValue.instance().setContent(vals);
             } else {
                 return SimpleValue.instance(JSON.toJSONString(mvelValue));
-            }
+            }*/
+            return SimpleValue.instance(mvelValue);
         }
     }
 
-    private static boolean isNeedScript(String beanId) {
-        return NEDD_SCRIPT_HANDLE.contains(beanId);
+    /**
+     * {"expression":"","expressionType":"groovy、jsonpath、no、spel"}
+     *
+     * @param resultMap 结果处理配置
+     * @return true ：需要结果脚本处理 false 不需要结果脚本处理
+     */
+    private static boolean isNeedScript(Map<String, Object> resultMap) {
+        String expressionType = MapUtils.getString(resultMap, "scriptType", "none");
+        return !StringUtils.equals(expressionType, "none");
     }
 
-    private static String getHandleBeanId(RpcBizEnum rpcBizEnum, Map<String, Object> bizParam) {
-        if (StringUtils.equals(rpcBizEnum.getCode(), RpcBizEnum.MALL_TRADE.getCode())) {
-            String labelKey = MapUtils.getString(bizParam, "labelKey");
-            return MALL_TRADE.get(labelKey);
-        } else {
-            return rpcBizEnum.getHandleBeanId();
-        }
-    }
 
     /**
      * 特殊场景需要转换运算符，比如 "条件控件--用户基础信息--性别" 选择多值场景
      *
      * @param op
-     * @param bizReq
+     * @param expectedValue
      * @return
      */
 
 
-    private static boolean isNeedConvert2InOp(Op op, BizReq bizReq) {
-        Object mvelValue = bizReq.getMvelValue();
-        if (Op.Equals == op && mvelValue instanceof JSONArray) {
+    private static boolean isNeedConvert2InOp(Op op, Object expectedValue) {
+        if (Op.Equals == op && expectedValue instanceof JSONArray) {
             return true;
         }
         return false;
@@ -378,7 +386,9 @@ public class RuleUtils {
     }
 
     public static void main(String[] args) {
-        String s = "{\"type\":\"and\",\"ruleName\":\"根组\",\"rule\":[{\"type\":\"and\",\"ruleName\":\"一组\",\"rule\":[{\"requestType\":\"native\",\"operator\":\"==\",\"expectedValue\":\"7-618002,das,das,dsa\",\"conditionIndex\":\"0\",\"dataType\":\"enum\",\"source\":{\"beanId\":\"interface\",\"methodName\":\"\",\"params\":[{\"paramName\":\"\",\"dataType\":\"\",\"value\":\"\"},{\"paramName\":\"\",\"dataType\":\"\",\"value\":\"\"}],\"result\":{\"expressionType\":\"groovy、jsonpath、no、spel\",\"expression\":\"\"}}},{\"requestType\":\"native\",\"operator\":\"==\",\"expectedValue\":\"7-618002,das,das,dsa\",\"conditionIndex\":\"1\",\"dataType\":\"enum\",\"source\":{\"beanId\":\"interface\",\"methodName\":\"\",\"params\":[{\"paramName\":\"\",\"dataType\":\"\",\"value\":\"\"},{\"paramName\":\"\",\"dataType\":\"\",\"value\":\"\"}],\"result\":{\"expressionType\":\"groovy、jsonpath、no、spel\",\"expression\":\"\"}}}]},{\"type\":\"and\",\"ruleName\":\"二组\",\"rule\":[{\"requestType\":\"jsf/native/https\",\"operator\":\"==\",\"expectedValue\":\"7-618002,das,das,dsa\",\"conditionIndex\":\"2\",\"dataType\":\"enum\",\"source\":{\"beanId\":\"interface\",\"methodName\":\"\",\"params\":[{\"paramName\":\"\",\"dataType\":\"\",\"value\":\"\"},{\"paramName\":\"\",\"dataType\":\"\",\"value\":\"\"}],\"result\":{\"expressionType\":\"groovy、jsonpath、no、spel\",\"expression\":\"\"}}}]}]}";
-        buildLhsByJson(s, null, null);
+
+        String s = "{\"type\":\"and\",\"ruleName\":\"根组\",\"rule\":[{\"type\":\"and\",\"ruleName\":\"一组\",\"rule\":[{\"requestType\":\"native\",\"operator\":\"==\",\"expectedValue\":\"7-618002,das,das,dsa\",\"conditionIndex\":\"0\",\"dataType\":\"enum\",\"source\":{\"beanId\":\"interface0\",\"methodName\":\"\",\"params\":[{\"paramName\":\"一组参数1\",\"dataType\":\"\",\"value\":\"\",\"scriptType\":\"jsonpath\",\"script\":\"$.data\"},{\"paramName\":\"一组参数2\",\"dataType\":\"String\",\"value\":\"1.2value \",\"scriptType\":\"none\",\"script\":\"脚本内容\"}],\"result\":{\"scriptType\":\"none、jsonpath、groovy、spel\",\"script\":\"\"}}},{\"requestType\":\"native\",\"operator\":\"==\",\"expectedValue\":\"7-618002,das,das,dsa\",\"conditionIndex\":\"1\",\"dataType\":\"enum\",\"source\":{\"beanId\":\"interface1\",\"methodName\":\"\",\"params\":[{\"paramName\":\"一组参数3\",\"dataType\":\"int\",\"value\":\"0\",\"scriptType\":\"none\",\"script\":\"脚本内容\"},{\"paramName\":\"一组参数4\",\"dataType\":\"boolean\",\"value\":\"false\",\"scriptType\":\"none\",\"script\":\"脚本内容\"}],\"result\":{\"scriptType\":\"none\",\"script\":\"\"}}}]},{\"type\":\"and\",\"ruleName\":\"二组\",\"rule\":[{\"requestType\":\"jsf/native/https\",\"operator\":\"==\",\"expectedValue\":\"7-618002,das,das,dsa\",\"conditionIndex\":\"2\",\"dataType\":\"enum\",\"source\":{\"beanId\":\"interface2\",\"methodName\":\"\",\"params\":[{\"paramName\":\"二组参数1\",\"dataType\":\"double\",\"value\":\"0.19\",\"scriptType\":\"none\",\"script\":\"\"},{\"paramName\":\"二组参数2\",\"dataType\":\"String\",\"value\":\"二组参数2值 \",\"scriptType\":\"none\",\"script\":\"脚本内容\"}],\"result\":{\"scriptType\":\"none、jsonpath、groovy、spel\",\"script\":\"\"}}}]}]}\n";
+        Lhs lhs = buildLhsByJson(s, null, null);
+        System.out.println();
     }
 }
