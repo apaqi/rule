@@ -36,6 +36,7 @@ import com.bstek.urule.model.library.variable.*;
 import com.bstek.urule.model.rete.JsonUtils;
 import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.*;
+import com.bstek.urule.runtime.assertor.AssertorEvaluator;
 import com.bstek.urule.script.ScriptType;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
@@ -79,6 +80,7 @@ import com.bstek.urule.runtime.KnowledgeSessionFactory;
 import com.bstek.urule.runtime.cache.CacheUtils;
 import com.bstek.urule.runtime.response.ExecutionResponse;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -94,6 +96,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	private HttpSessionKnowledgeCache httpSessionKnowledgeCache;
 
 	private KnowledgeHelper knowledgeHelper;
+	@Autowired
+	private AssertorEvaluator baseEvaluator;
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String method=retriveMethod(req);
@@ -618,6 +622,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		//doTest_back(req,  resp);
 		//testCommonObjectParamMethodRule(req, resp);
 		//testComplexObjectParamMethodRule(req, resp);
+		//boolean evaluate = baseEvaluator.evaluate("12fd", Arrays.asList("12f","d4ad","4gfs"), Datatype.String, Op.In);
 		testMultipleParamMethodRule(req, resp);
 
  		System.out.println();

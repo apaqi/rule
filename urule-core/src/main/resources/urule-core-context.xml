@@ -384,4 +384,7 @@
 	<bean id="knowledgeHelper" class="com.bstek.urule.knowledge.KnowledgeHelper">
 		<property name="knowledgeBuilder" ref="urule.knowledgeBuilder"></property>
 	</bean>
+
+	<bean id="baseEvaluator" class="com.bstek.urule.runtime.assertor.AssertorEvaluator"></bean>
+
 </beans>
