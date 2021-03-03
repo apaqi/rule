@@ -621,9 +621,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		//testScriptMethodRule(req,  resp);
 		//doTest_back(req,  resp);
 		//testCommonObjectParamMethodRule(req, resp);
-		//testComplexObjectParamMethodRule(req, resp);
+		testComplexObjectParamMethodRule(req, resp);
 		//boolean evaluate = baseEvaluator.evaluate("12fd", Arrays.asList("12f","d4ad","4gfs"), Datatype.String, Op.In);
-		testMultipleParamMethodRule(req, resp);
+		///testMultipleParamMethodRule(req, resp);
 
  		System.out.println();
 	}
@@ -898,7 +898,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 				.setLeft(Left.instance(leftPart3))
 				.setOp(Op.Equals)
 				.setValue(SimpleValue.instance("true"));
-		Or and = Or.instance().addCriterion(false, criteria1, criteria2, criteria3);
+		And and = And.instance().addCriterion(false, criteria1, criteria2, criteria3);
 		/**规则组2*/
 		/**规则组2 中的规则1*/
 		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "hello");

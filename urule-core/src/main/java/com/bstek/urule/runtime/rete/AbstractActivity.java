@@ -19,6 +19,7 @@ import com.bstek.urule.RuleException;
 import com.bstek.urule.model.rule.lhs.*;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,8 +51,8 @@ public abstract class AbstractActivity implements Activity {
         }
         List<FactTracker> trackers = null;
         int size = paths.size();
-        Map<Integer,Integer> orExceptionData = new ConcurrentHashMap<>();
-        Map<Integer,Integer> orSuccessData = new ConcurrentHashMap<>();
+        Map<Integer,String> orExceptionData = new ConcurrentHashMap<>();
+        Map<Integer,String> orSuccessData = new ConcurrentHashMap<>();
         for (int i = 0; i < size; i++) {
             Path path = paths.get(i);
             Collection<FactTracker> results = null;
@@ -70,13 +71,19 @@ public abstract class AbstractActivity implements Activity {
                  */
                 try {
                     results = activity.enter(context, obj, tracker.newSubFactTracker(), newVariableMap);
-                } catch (Exception e) {
+                } catch (Throwable e) {
+                    String errorMsg = "规则校验异常！";
+                    if(null != e && null != e.getCause() && e.getCause() instanceof InvocationTargetException && null != ((InvocationTargetException)e.getCause()).getTargetException()) {
+                       errorMsg = ((InvocationTargetException)e.getCause()).getTargetException().getMessage();
+                    }else if(null != e && null != e.getCause() && e.getCause() instanceof Exception){
+                       errorMsg = ((Exception)e.getCause()).getMessage();
+                    }
                     //Junction parent = ((CriteriaActivity) activity).getCriteria().getParent();
                     if(parent instanceof And) {
-                        throw new RuleException("规则校验异常！");
+                        throw new RuleException(errorMsg);
                     }
                     if (parent instanceof Or){
-                        orExceptionData.put(parentHashCode,parentHashCode);
+                        orExceptionData.put(parentHashCode,errorMsg);
                     }
                 }
             } else {
@@ -84,13 +91,13 @@ public abstract class AbstractActivity implements Activity {
             }
             if (results != null) {//match 场景
                 if(parent instanceof Or) {
-                    orSuccessData.put(parentHashCode,parentHashCode);
+                    orSuccessData.put(parentHashCode,"规则校验成功！");
                 }
                 //check
                 int nextPathParentHashCode = getNextPathObjAddress(i, size);
                 if(null != parent && parent instanceof Or && (null == parent.getParent() || parentHashCode != nextPathParentHashCode) ) {
                     if (orExceptionData.containsKey(parentHashCode) && !orSuccessData.containsKey(parentHashCode)) {
-                        throw new RuleException("规则校验异常！");
+                        throw new RuleException(orExceptionData.get(parentHashCode));
                     }
                 }
                 if (trackers == null) {
@@ -103,7 +110,7 @@ public abstract class AbstractActivity implements Activity {
                 //parentHashCode != nextPathParentHashCode 多层或条件组，最后一个条件判断
                 if(null != parent && parent instanceof Or && ((null == parent.getParent() && parent.getCriterions().size() -1 == i) || parentHashCode != nextPathParentHashCode) ) {
                     if (orExceptionData.containsKey(parentHashCode) && !orSuccessData.containsKey(parentHashCode)) {
-                        throw new RuleException("规则校验异常！");
+                        throw new RuleException(orExceptionData.get(parentHashCode));
                     }
                 }
 
