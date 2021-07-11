@@ -19,7 +19,10 @@ public class Rule implements Serializable {
      */
     private Rule[] rule;
 
-    private RuleCalData[] ruleCalDatas;
+   // private List<CalData> calData;
+    private Left left;
+    private String operator;
+    private Right right;
 
     public String getType() {
         return type;
@@ -39,12 +42,27 @@ public class Rule implements Serializable {
         return this;
     }
 
-    public RuleCalData[] getRuleCalDatas() {
-        return ruleCalDatas;
+    public Left getLeft() {
+        return left;
     }
 
-    public Rule setRuleCalDatas(RuleCalData[] ruleCalDatas) {
-        this.ruleCalDatas = ruleCalDatas;
-        return this;
+    public void setLeft(Left left) {
+        this.left = left;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public Right getRight() {
+        return right;
+    }
+
+    public void setRight(Right right) {
+        this.right = right;
     }
 }

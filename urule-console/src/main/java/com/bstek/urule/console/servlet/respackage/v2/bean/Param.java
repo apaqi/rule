@@ -14,7 +14,27 @@ import java.util.*;
  * @since 2021/07/09
  */
 public class Param implements Serializable {
+
+    private String code;
+    private Object value;
     private Map<String, Object> param;
+
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 
     public Map<String, Object> getParam() {
         return param;
@@ -23,6 +43,7 @@ public class Param implements Serializable {
     public void setParam(Map<String, Object> param) {
         this.param = param;
     }
+
 
     public List<RuleParam> convert2RuleParams() {
         if (MapUtils.isNotEmpty(param)) {

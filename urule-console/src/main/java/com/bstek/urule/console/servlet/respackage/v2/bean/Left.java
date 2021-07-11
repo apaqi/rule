@@ -11,7 +11,7 @@ public class Left implements Serializable {
     /**
      * 参数
      */
-    private Param param;
+    private Param[] param;
     /**
      * 请求URL
      */
@@ -21,11 +21,11 @@ public class Left implements Serializable {
      */
     private String protocol;
 
-    public Param getParam() {
+    public Param[] getParam() {
         return param;
     }
 
-    public Left setParam(Param param) {
+    public Left setParam(Param[] param) {
         this.param = param;
         return this;
     }

@@ -368,9 +368,7 @@ public class RuleUtils4Json {
      * @return
      */
     private static Lhs buildLhsByJson(String paramJson, Map<String, Object> extention, Map<String, Object> responseParam) {
-        Map<String, Object> mapSource = JSON.parseObject(paramJson, Map.class);
-        JSONObject map = (JSONObject)mapSource.get("rule");
-
+        Map<String, Object> map = JSON.parseObject(paramJson, Map.class);
         Junction parentJunction = null;
         List<Criterion> conditions = RuleUtils4Json.parseCriterions(map, true, parentJunction, null, extention, responseParam);
         Criterion rootJunctionType = RuleUtils4Json.getRootJunctionByType(map);
@@ -389,7 +387,7 @@ public class RuleUtils4Json {
 
     public static void main(String[] args) {
         //4.引擎2.0规则文件模板（Final）
-        String s = "{\"rule\":{\"type\":\"and\",\"rule\":[{\"type\":\"and\",\"rule\":[{\"left\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"isHit\",\"protocol\":\"JSF\"},\"operator\":\"contains\",\"right\":{\"param\":[{\"code\":\"result\",\"dataType\":\"boolean\",\"value\":10002}],\"url\":\"\",\"protocol\":\"FIXED\"}},{\"left\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"接口#method\",\"protocol\":\"JSF\"},\"operator\":\"contains\",\"right\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"C54GFDG56FDS54GDS\",\"protocol\":\"JSF\"}}]},{\"type\":\"and\",\"rule\":[{\"left\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"C54GFDG56FDS54GDS\",\"protocol\":\"HTTP\"},\"operator\":\"contains\",\"right\":{\"param\":[{\"code\":\"result\",\"dataType\":\"boolean\",\"value\":10002}],\"url\":\"\",\"protocol\":\"FIXED\"}}]}]}}\n";
+        String s = "{\"type\":\"and\",\"rule\":[{\"type\":\"and\",\"rule\":[{\"left\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"isHit\",\"protocol\":\"JSF\"},\"operator\":\"contains\",\"right\":{\"param\":[{\"code\":\"result\",\"dataType\":\"boolean\",\"value\":10002}],\"url\":\"\",\"protocol\":\"FIXED\"}},{\"left\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"接口#method\",\"protocol\":\"JSF\"},\"operator\":\"contains\",\"right\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"C54GFDG56FDS54GDS\",\"protocol\":\"JSF\"}}]},{\"type\":\"and\",\"rule\":[{\"left\":{\"param\":[{\"code\":\"skuId\",\"dataType\":\"Long\",\"value\":10002},{\"code\":\"prize\",\"dataType\":\"BigDecimal\",\"value\":13.24}],\"url\":\"C54GFDG56FDS54GDS\",\"protocol\":\"HTTP\"},\"operator\":\"contains\",\"right\":{\"param\":[{\"code\":\"result\",\"dataType\":\"boolean\",\"value\":10002}],\"url\":\"\",\"protocol\":\"FIXED\"}}]}]}";
         Map<String, Object> paramMap = new HashMap<>();
         Lhs lhs = buildLhsByJson(s, null, null);
         System.out.println();

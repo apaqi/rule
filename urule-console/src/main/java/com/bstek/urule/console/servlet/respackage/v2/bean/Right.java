@@ -12,7 +12,7 @@ public class Right implements Serializable {
     /**
      * 参数
      */
-    private Param param;
+    private Param[] param;
     /**
      * 请求URL
      */
@@ -22,11 +22,11 @@ public class Right implements Serializable {
      */
     private String protocol;
 
-    public Param getParam() {
+    public Param[] getParam() {
         return param;
     }
 
-    public Right setParam(Param param) {
+    public Right setParam(Param[] param) {
         this.param = param;
         return this;
     }
