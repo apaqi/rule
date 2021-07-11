@@ -1,5 +1,6 @@
 >个人博客搭建 https://zhuanlan.zhihu.com/p/28321740
 #rete算法
+>https://www.cnblogs.com/qiyexue/p/7822464.html
 >https://blog.csdn.net/u012373815/article/details/53869097/
 >https://blog.csdn.net/lthirdonel/article/details/80948922
 >https://baijiahao.baidu.com/s?id=1618572239580225767&wfr=spider&for=pc

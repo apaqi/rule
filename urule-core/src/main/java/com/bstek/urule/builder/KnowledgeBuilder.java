@@ -201,7 +201,7 @@ public class KnowledgeBuilder extends AbstractBuilder {
     /**
      * 根据规则集和资源库构造知识库
      * @param ruleSet ruleSet
-     * @param  variableCategoryLibs2 variableCategoryLibs
+     * @param  variableCategoryLibs variableCategoryLibs
      * @return KnowledgeBase KnowledgeBase
      */
     public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<VariableLibrary> variableCategoryLibs) {

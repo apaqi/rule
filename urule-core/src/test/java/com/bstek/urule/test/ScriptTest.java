@@ -1,3 +1,4 @@
+/*
 package com.bstek.urule.test;
 
 
@@ -22,7 +23,9 @@ public class ScriptTest {
         System.out.println(invoke);
     }
 
-    /**https://blog.csdn.net/chengbinbbs/article/details/86743205*/
+    */
+/**https://blog.csdn.net/chengbinbbs/article/details/86743205*//*
+
     @Test
     public void testJsonPathGroovy(){
         String script = "def testMethodName(map){\n" +
@@ -61,3 +64,4 @@ public class ScriptTest {
         System.out.println(invoke);
     }
 }
+*/

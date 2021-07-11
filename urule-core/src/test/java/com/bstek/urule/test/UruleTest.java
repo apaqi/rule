@@ -1,3 +1,4 @@
+/*
 package com.bstek.urule.test;
 
 import com.alibaba.fastjson.JSON;
@@ -17,38 +18,52 @@ import org.testng.annotations.Test;
 
 import java.util.*;
 
+*/
 /**
  * @author wpx
  * @Description 类注释
  * @date 2020/12/29
- */
+ *//*
+
 public class UruleTest {
     @Test
     public void dd(){
 
         Parameter parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "123");
-        /**规则组1*/
-        /**规则组1--规则1*/
+        */
+/**规则组1*//*
+
+        */
+/**规则组1--规则1*//*
+
         MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "evalTest", parameter);
         Criteria criteria1 = Criteria.instance()
                 .setLeft(Left.instance(leftPart))
                 .setOp(Op.Equals)
                 .setValue(SimpleValue.instance("testValue"));
 
-        /**规则组1--规则2*/
+        */
+/**规则组1--规则2*//*
+
         MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "evalTest", parameter);
         Criteria criteria2 = Criteria.instance()
                 .setLeft(Left.instance(leftPart))
                 .setOp(Op.Equals)
                 .setValue(SimpleValue.instance("testValue"));
         And and = And.instance().addCriterion(false, criteria1, criteria2);
-        /**规则组2*/
-        /**规则组2 中的规则1*/
+        */
+/**规则组2*//*
+
+        */
+/**规则组2 中的规则1*//*
+
         Criteria orCriteria1 = Criteria.instance()
                 .setLeft(Left.instance(leftPart))
                 .setOp(Op.Equals)
                 .setValue(SimpleValue.instance("testValue"));
-        /**规则组2 中的规则2*/
+        */
+/**规则组2 中的规则2*//*
+
         Criteria orCriteria2 = Criteria.instance()
                 .setLeft(Left.instance(leftPart))
                 .setOp(Op.Equals)
@@ -118,8 +133,12 @@ public class UruleTest {
                 Parameter bizReqs = BizUtils.buildComplexObjectValueParameter("bizReqs", Datatype.Map, bizReqsParam);
                 Parameter extention = BizUtils.buildComplexObjectValueParameter("extention", Datatype.Map, extentionParam);
                 Parameter response = BizUtils.buildComplexObjectValueParameter("response", Datatype.Map, responseParam);
-                /**规则组1*/
-                /**规则组1--规则1*/
+                */
+/**规则组1*//*
+
+                */
+/**规则组1--规则1*//*
+
                 //后期针对控件依赖的资源做资源化管理
                 MethodLeftPart leftPart = BizUtils.buildMethodLeftPart(beanId, "bizData", bizReqs, extention, response);
                 Criteria criteria = Criteria.instance()
@@ -179,3 +198,4 @@ public class UruleTest {
         }
     }
 }
+*/

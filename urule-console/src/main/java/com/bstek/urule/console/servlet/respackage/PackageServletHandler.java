@@ -619,9 +619,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		//testRuleGroup(req, resp);
 		//testScriptMethodRule(req,  resp);
-		//doTest_back(req,  resp);
+		doTest_back(req,  resp);
 		//testCommonObjectParamMethodRule(req, resp);
-		testComplexObjectParamMethodRule(req, resp);
+		//testComplexObjectParamMethodRule(req, resp);
 		//boolean evaluate = baseEvaluator.evaluate("12fd", Arrays.asList("12f","d4ad","4gfs"), Datatype.String, Op.In);
 		///testMultipleParamMethodRule(req, resp);
 
