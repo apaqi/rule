@@ -147,8 +147,6 @@ public class RuleUtils4Json {
      * @param responseParam
      * @return
      */
-
-
     public static List<Criterion> parseCriterions(Map<String, Object> param, boolean isRoot, Criterion parentJunction, List<Criterion> junctions,
                                                   Map<String, Object> extentionParam, Map<String, Object> responseParam) {
         //1、判断type如果为空设置默认值and 单个参数默认为and 多个参数可能是and或者or
@@ -231,7 +229,7 @@ public class RuleUtils4Json {
                 String beanId = MapUtils.getString(leftSourceMap, "");//todo 2.0 默认写死？？
                 String methodName = MapUtils.getString(leftSourceMap, "url"); ///todo 2.0 默认写死？？
                 String result = MapUtils.getString(leftSourceMap, "result");
-                String operator = MapUtils.getString(leftSourceMap, "operator","==");
+                String operator = MapUtils.getString(leftSourceMap, "operator", "==");
                 Parameter[] params = buildParameters(leftSourceMap);
                 Map<String, Object> resultMap = JSON.parseObject(result, Map.class);
                 //后期针对控件依赖的资源做资源化管理
@@ -261,7 +259,7 @@ public class RuleUtils4Json {
     }
 
     private static Parameter[] buildParameters(Map<String, Object> sourceMap) {
-        JSONArray leftParam = (JSONArray)MapUtils.getObject(sourceMap, "param");
+        JSONArray leftParam = (JSONArray) MapUtils.getObject(sourceMap, "param");
         int len = leftParam.size();
 
         Parameter[] parameters = new Parameter[len];
