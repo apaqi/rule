@@ -83,7 +83,9 @@ public class EqualsIgnoreCaseAssertor implements Assertor {
 			return right.toString().equalsIgnoreCase(left.toString());
 		}
 	}
-	public boolean support(Op op) {
-		return op.equals(Op.EqualsIgnoreCase);
+
+	@Override
+	public Op getOp() {
+		return Op.EqualsIgnoreCase;
 	}
 }

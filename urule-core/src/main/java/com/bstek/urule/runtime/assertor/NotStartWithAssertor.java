@@ -39,7 +39,8 @@ public class NotStartWithAssertor implements Assertor {
 		return false;
 	}
 
-	public boolean support(Op op) {
-		return op.equals(Op.NotStartWith);
+	@Override
+	public Op getOp() {
+		return Op.NotStartWith;
 	}
 }

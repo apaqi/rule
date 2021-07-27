@@ -35,8 +35,8 @@ public class NotMatchAssertor implements Assertor {
 		return !matcher.matches();
 	}
 
-	public boolean support(Op op) {
-		return op.equals(Op.NotMatch);
+	@Override
+	public Op getOp() {
+		return Op.NotMatch;
 	}
-
 }

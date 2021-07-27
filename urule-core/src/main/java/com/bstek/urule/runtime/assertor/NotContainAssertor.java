@@ -30,7 +30,8 @@ public class NotContainAssertor extends ContainAssertor {
 		return !super.eval(left, right, datatype);
 	}
 
-	public boolean support(Op op) {
-		return op.equals(Op.NotContain);
+	@Override
+	public Op getOp() {
+		return Op.NotContain;
 	}
 }

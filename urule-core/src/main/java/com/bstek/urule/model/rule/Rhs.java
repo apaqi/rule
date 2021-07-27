@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.bstek.urule.model.rule;
 
+import com.bstek.urule.action.Action;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.bstek.urule.action.Action;
 
 /**
  * @author Jacky.gao

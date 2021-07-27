@@ -83,7 +83,9 @@ public class EqualsAssertor implements Assertor {
 			return right.toString().equals(left.toString());
 		}
 	}
-	public boolean support(Op op) {
-		return op.equals(Op.Equals);
+
+	@Override
+	public Op getOp() {
+		return Op.Equals;
 	}
 }

@@ -26,8 +26,9 @@ public class NotInAssertor extends InAssertor {
 	public boolean eval(Object left, Object right,Datatype datatype) {
 		return !super.eval(left, right,datatype);
 	}
+
 	@Override
-	public boolean support(Op op) {
-		return op.equals(Op.NotIn);
+	public Op getOp() {
+		return Op.NotIn;
 	}
 }

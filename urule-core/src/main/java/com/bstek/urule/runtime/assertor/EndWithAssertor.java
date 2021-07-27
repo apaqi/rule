@@ -38,7 +38,8 @@ public class EndWithAssertor implements Assertor {
 		return false;
 	}
 
-	public boolean support(Op op) {
-		return op.equals(Op.EndWith);
+	@Override
+	public Op getOp() {
+		return Op.EndWith;
 	}
 }

@@ -23,6 +23,20 @@ import com.bstek.urule.model.rule.Op;
  * @since 2015年1月6日
  */
 public interface Assertor {
+	/**
+	 * 规则计算
+	 *
+	 * @param left
+	 * @param right
+	 * @param datatype
+	 * @return
+	 */
 	boolean eval(Object left,Object right,Datatype datatype);
-	boolean support(Op op);
+
+	/**
+	 * 获取操作符
+	 *
+	 * @return
+	 */
+	Op getOp();
 }

@@ -95,8 +95,9 @@ public class InAssertor implements Assertor {
 		}
 		return false;
 	}
-	
-	public boolean support(Op op) {
-		return op.equals(Op.In);
+
+	@Override
+	public Op getOp() {
+		return Op.In;
 	}
 }

@@ -55,7 +55,8 @@ public class GreaterThenAssertor implements Assertor {
 		return false;
 	}
 
-	public boolean support(Op op) {
-		return op.equals(Op.GreaterThen);
+	@Override
+	public Op getOp() {
+		return Op.GreaterThen;
 	}
 }

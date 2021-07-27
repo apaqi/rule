@@ -54,7 +54,9 @@ public class LessThenAssertor implements Assertor {
 		return false;
 	}
 
-	public boolean support(Op op) {
-		return op.equals(Op.LessThen);
+
+	@Override
+	public Op getOp() {
+		return Op.LessThen;
 	}
 }
