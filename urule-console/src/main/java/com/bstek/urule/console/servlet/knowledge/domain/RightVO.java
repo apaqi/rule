@@ -1,4 +1,4 @@
-package com.bstek.urule.console.servlet.respackage.v2.bean;
+package com.bstek.urule.console.servlet.knowledge.domain;
 
 import java.io.Serializable;
 
@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @Description TODO
  * @since 2021/07/09
  */
-public class Right implements Serializable {
+public class RightVO implements Serializable {
     /**
      * 参数
      */
@@ -26,7 +26,7 @@ public class Right implements Serializable {
         return param;
     }
 
-    public Right setParam(Param[] param) {
+    public RightVO setParam(Param[] param) {
         this.param = param;
         return this;
     }
@@ -35,7 +35,7 @@ public class Right implements Serializable {
         return url;
     }
 
-    public Right setUrl(String url) {
+    public RightVO setUrl(String url) {
         this.url = url;
         return this;
     }
@@ -44,7 +44,7 @@ public class Right implements Serializable {
         return protocol;
     }
 
-    public Right setProtocol(String protocol) {
+    public RightVO setProtocol(String protocol) {
         this.protocol = protocol;
         return this;
     }

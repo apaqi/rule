@@ -1,4 +1,4 @@
-package com.bstek.urule.console.servlet.respackage.v2.bean;
+package com.bstek.urule.console.servlet.knowledge.domain;
 
 import java.io.Serializable;
 
@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @Description TODO
  * @since 2021/07/09
  */
-public class Rule implements Serializable {
+public class RuleVO implements Serializable {
     /**
      * 类型（and 、 or）
      */
@@ -17,36 +17,36 @@ public class Rule implements Serializable {
     /**
      * 规则
      */
-    private Rule[] rule;
+    private RuleVO[] rule;
 
    // private List<CalData> calData;
-    private Left left;
+    private LeftVO left;
     private String operator;
-    private Right right;
+    private RightVO right;
 
     public String getType() {
         return type;
     }
 
-    public Rule setType(String type) {
+    public RuleVO setType(String type) {
         this.type = type;
         return this;
     }
 
-    public Rule[] getRule() {
+    public RuleVO[] getRule() {
         return rule;
     }
 
-    public Rule setRule(Rule[] rule) {
+    public RuleVO setRule(RuleVO[] rule) {
         this.rule = rule;
         return this;
     }
 
-    public Left getLeft() {
+    public LeftVO getLeft() {
         return left;
     }
 
-    public void setLeft(Left left) {
+    public void setLeft(LeftVO left) {
         this.left = left;
     }
 
@@ -58,11 +58,11 @@ public class Rule implements Serializable {
         this.operator = operator;
     }
 
-    public Right getRight() {
+    public RightVO getRight() {
         return right;
     }
 
-    public void setRight(Right right) {
+    public void setRight(RightVO right) {
         this.right = right;
     }
 }

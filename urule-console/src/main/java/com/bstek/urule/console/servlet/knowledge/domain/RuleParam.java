@@ -1,4 +1,4 @@
-package com.bstek.urule.console.servlet.respackage.v2.bean;
+package com.bstek.urule.console.servlet.knowledge.domain;
 
 /**
  * @author wpx
