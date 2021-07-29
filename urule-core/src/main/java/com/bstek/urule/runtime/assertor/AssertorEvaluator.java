@@ -48,7 +48,7 @@ public class AssertorEvaluator implements ApplicationContextAware {
         Collection<Assertor> assertors = applicationContext.getBeansOfType(Assertor.class).values();
         for (Assertor assertor : assertors) {
             for (Op op : Op.values()) {
-                if(assertor.support(op)) {
+                if (assertor.support(op)) {
                     ASSERTORS.put(op, assertor);
                 }
             }
