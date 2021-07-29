@@ -28,7 +28,7 @@ public class NotInAssertor extends InAssertor {
 	}
 
 	@Override
-	public Op getOp() {
-		return Op.NotIn;
+	public boolean support(Op op) {
+		return op.equals(Op.NotIn);
 	}
 }

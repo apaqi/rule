@@ -40,8 +40,7 @@ public class StartWithAssertor implements Assertor {
         return false;
     }
 
-    @Override
-    public Op getOp() {
-        return Op.StartWith;
-    }
+	public boolean support(Op op) {
+		return op.equals(Op.StartWith);
+	}
 }

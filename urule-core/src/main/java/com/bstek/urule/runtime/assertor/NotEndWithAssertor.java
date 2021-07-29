@@ -39,8 +39,7 @@ public class NotEndWithAssertor implements Assertor {
 		return false;
 	}
 
-	@Override
-	public Op getOp() {
-		return Op.NotEndWith;
+	public boolean support(Op op) {
+		return op.equals(Op.NotEndWith);
 	}
 }

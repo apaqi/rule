@@ -35,8 +35,7 @@ public class MatchAssertor implements Assertor {
 		return matcher.matches();
 	}
 
-	@Override
-	public Op getOp() {
-		return Op.Match;
+	public boolean support(Op op) {
+		return op.equals(Op.Match);
 	}
 }

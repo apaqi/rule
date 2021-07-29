@@ -34,8 +34,7 @@ public class NotEqualsAssertor extends EqualsAssertor {
 		return !super.eval(left, right, datatype);
 	}
 
-	@Override
-	public Op getOp() {
-		return Op.NotEquals;
+	public boolean support(Op op) {
+		return op.equals(Op.NotEquals);
 	}
 }

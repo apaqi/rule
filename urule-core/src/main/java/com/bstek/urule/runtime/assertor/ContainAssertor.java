@@ -46,8 +46,7 @@ public class ContainAssertor implements Assertor {
 		return leftStr.contains(rightStr);
 	}
 
-	@Override
-	public Op getOp() {
-		return Op.Contain;
+	public boolean support(Op op) {
+		return op.equals(Op.Contain);
 	}
 }

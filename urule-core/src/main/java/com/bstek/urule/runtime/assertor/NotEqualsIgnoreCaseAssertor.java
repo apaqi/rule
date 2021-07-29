@@ -34,8 +34,7 @@ public class NotEqualsIgnoreCaseAssertor extends EqualsIgnoreCaseAssertor {
 		return !super.eval(left, right, datatype);
 	}
 
-	@Override
-	public Op getOp() {
-		return Op.NotEqualsIgnoreCase;
+	public boolean support(Op op) {
+		return op.equals(Op.NotEqualsIgnoreCase);
 	}
 }

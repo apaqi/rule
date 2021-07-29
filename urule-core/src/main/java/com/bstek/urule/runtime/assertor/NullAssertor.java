@@ -34,8 +34,7 @@ public class NullAssertor implements Assertor {
 		}
 	}
 
-	@Override
-	public Op getOp() {
-		return Op.Null;
+	public boolean support(Op op) {
+		return op.equals(Op.Null);
 	}
 }

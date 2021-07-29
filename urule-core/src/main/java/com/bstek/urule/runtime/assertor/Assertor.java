@@ -38,5 +38,5 @@ public interface Assertor {
 	 *
 	 * @return
 	 */
-	Op getOp();
+	boolean support(Op op);
 }
