@@ -18,6 +18,7 @@ package com.bstek.urule.parse;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
@@ -68,6 +69,7 @@ public class RuleSetParser implements Parser<RuleSet> {
 			}
 		}
 		ruleSet.setRules(rules);
+		//todo rebuildRules 的作用是什么？
 		rulesRebuilder.rebuildRules(ruleSet.getLibraries(), rules);
 		return ruleSet;
 	}

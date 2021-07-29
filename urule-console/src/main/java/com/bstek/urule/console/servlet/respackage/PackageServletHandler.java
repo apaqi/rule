@@ -653,13 +653,13 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			for(Variable var:vc.getVariables()){
 				buildObject(entity, var);				
 			}
-			facts.put(vc,entity);
+			facts.put(vc,entity/**key:变量code, value:变量值*/);
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
 		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
-			knowledgeBase= buildKnowledgeBase(req);
+			knowledgeBase= buildKnowledgeBase(req);//构建知识包
 			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
